@@ -16,32 +16,21 @@
             justify-content: space-between;
             height: 100vh;
         }
-        .zoom-container {
-            flex-grow: 1;
-            width: 100vw;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            touch-action: auto;
-        }
         .map-container {
             position: relative;
-            width: 800px; /* Mesmo tamanho do mapa do index */
+            width: 800px; /* Mesmo tamanho do mapa */
             height: 600px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            touch-action: auto;
+            overflow: hidden;
         }
         #map {
             width: 100%;
             height: 100%;
             display: block;
-            touch-action: auto;
         }
         #coordenadas {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: blue;
             padding: 10px;
@@ -60,10 +49,8 @@
 
     <h2>Capturar Coordenadas</h2>
     
-    <div class="zoom-container">
-        <div class="map-container" id="mapContainer">
-            <img id="map" src="mapa.png" alt="Mapa do Loteamento">
-        </div>
+    <div class="map-container">
+        <img id="map" src="mapa.png" alt="Mapa do Loteamento">
     </div>
 
     <div id="coordenadas">Clique no mapa para ver as coordenadas</div>
@@ -75,16 +62,12 @@
     <script>
         document.getElementById("map").addEventListener("click", function(event) {
             const rect = event.target.getBoundingClientRect();
-
-            // Captura a posição correta em relação ao mapa
             const x = Math.round(event.clientX - rect.left);
             const y = Math.round(event.clientY - rect.top);
 
-            // Exibe as coordenadas na tela
             document.getElementById("coordenadas").innerText = `Coordenadas: X=${x}, Y=${y}`;
         });
     </script>
 
 </body>
 </html>
-
