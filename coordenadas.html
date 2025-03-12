@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captura de Coordenadas</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .map-container {
+            position: relative;
+            display: inline-block;
+        }
+        #map {
+            width: 100%;
+            max-width: 800px;
+            cursor: crosshair;
+        }
+        #coordenadas {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Captura de Coordenadas</h2>
+    <p>Clique no mapa para obter as coordenadas do ponto exato.</p>
+    <div class="map-container">
+        <img id="map" src="mapa.png" alt="Mapa do Loteamento">
+    </div>
+    <p id="coordenadas">Coordenadas: (Clique no mapa)</p>
+
+    <script>
+        document.getElementById("map").addEventListener("click", function(event) {
+            const rect = event.target.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            document.getElementById("coordenadas").textContent = `Coordenadas: X=${Math.round(x)}, Y=${Math.round(y)}`;
+        });
+    </script>
+
+</body>
+</html>
