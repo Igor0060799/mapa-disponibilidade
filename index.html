@@ -10,37 +10,25 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .zoom-container {
-            width: 100vw;
-            height: 100vh;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation; /* Permite zoom e rolagem */
         }
         .map-container {
             position: relative;
-            width: 100%;
-            max-width: 1000px; /* Permite mapa maior */
-            height: auto;
+            width: 800px; /* Tamanho fixo do mapa */
+            height: 600px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            touch-action: manipulation; /* Permite gestos no celular */
+            overflow: hidden;
         }
         #map {
             width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
-            touch-action: manipulation;
         }
         #lotes {
             position: absolute;
@@ -51,11 +39,11 @@
         }
         .lote {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             text-align: center;
-            font-size: 6px;
+            font-size: 9px;
             color: white;
             display: flex;
             align-items: center;
@@ -68,11 +56,9 @@
 
     <h2>Mapa de Disponibilidade</h2>
     
-    <div class="zoom-container">
-        <div class="map-container">
-            <img id="map" src="mapa.png" alt="Mapa do Loteamento" loading="lazy">
-            <div id="lotes"></div>
-        </div>
+    <div class="map-container">
+        <img id="map" src="mapa.png" alt="Mapa do Loteamento" loading="lazy">
+        <div id="lotes"></div>
     </div>
 
     <script>
@@ -115,7 +101,6 @@
             }
         }
 
-        // Carrega os dados assim que a página estiver pronta
         document.addEventListener("DOMContentLoaded", carregarDados);
     </script>
 
