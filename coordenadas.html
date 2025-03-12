@@ -38,17 +38,17 @@
         document.getElementById("map").addEventListener("click", function(event) {
             const rect = event.target.getBoundingClientRect();
             
-            // Ajuste fino no posicionamento
-            const margemX = rect.left;
-            const margemY = rect.top;
+            // Ajuste fino nas coordenadas
+            const ajusteX = 3; // Corrigindo deslocamento para a esquerda
+            const ajusteY = 3; // Corrigindo deslocamento para cima
 
-            // Ajustando coordenadas com base no tamanho real da imagem
-            const x = event.clientX - margemX;
-            const y = event.clientY - margemY;
+            const x = Math.round(event.clientX - rect.left - ajusteX);
+            const y = Math.round(event.clientY - rect.top - ajusteY);
 
-            document.getElementById("coordenadas").textContent = `Coordenadas: X=${Math.round(x)}, Y=${Math.round(y)}`;
+            document.getElementById("coordenadas").textContent = `Coordenadas: X=${x}, Y=${y}`;
         });
     </script>
 
 </body>
 </html>
+
