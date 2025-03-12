@@ -8,20 +8,33 @@
         body {
             text-align: center;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         .map-container {
             position: relative;
             display: inline-block;
+            width: 95%; /* Ocupa quase toda a largura da tela */
+            max-width: 800px;
         }
         #map {
-            width: 100%;
-            max-width: 800px;
+            width: 100%; /* Ajusta a largura automaticamente */
+            height: auto; /* Mantém a proporção */
             cursor: crosshair;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
         #coordenadas {
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
+            color: #333;
+        }
+        @media (max-width: 600px) {
+            #coordenadas {
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -35,29 +48,4 @@
     <p id="coordenadas">Coordenadas: (Clique no mapa)</p>
 
     <script>
-        document.getElementById("map").addEventListener("click", function(event) {
-            const img = event.target;
-            const rect = img.getBoundingClientRect();
-
-            // Tamanho real da imagem
-            const imgWidth = img.naturalWidth;
-            const imgHeight = img.naturalHeight;
-
-            // Tamanho da imagem na tela
-            const displayedWidth = rect.width;
-            const displayedHeight = rect.height;
-
-            // Coordenadas do clique relativas à imagem na tela
-            const xClick = event.clientX - rect.left;
-            const yClick = event.clientY - rect.top;
-
-            // Ajustando para a escala real da imagem
-            const xReal = Math.round((xClick / displayedWidth) * imgWidth);
-            const yReal = Math.round((yClick / displayedHeight) * imgHeight);
-
-            document.getElementById("coordenadas").textContent = `Coordenadas: X=${xReal}, Y=${yReal}`;
-        });
-    </script>
-
-</body>
-</html>
+        document.getElementById("map").addEventListener
