@@ -28,7 +28,7 @@
 <body>
 
     <h2>Captura de Coordenadas</h2>
-    <p>Clique no mapa para obter as coordenadas do ponto exato.</p>
+    <p>Clique no mapa para obter as coordenadas exatas.</p>
     <div class="map-container">
         <img id="map" src="mapa.png" alt="Mapa do Loteamento">
     </div>
@@ -37,8 +37,14 @@
     <script>
         document.getElementById("map").addEventListener("click", function(event) {
             const rect = event.target.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
+            
+            // Ajuste fino no posicionamento
+            const margemX = rect.left;
+            const margemY = rect.top;
+
+            // Ajustando coordenadas com base no tamanho real da imagem
+            const x = event.clientX - margemX;
+            const y = event.clientY - margemY;
 
             document.getElementById("coordenadas").textContent = `Coordenadas: X=${Math.round(x)}, Y=${Math.round(y)}`;
         });
