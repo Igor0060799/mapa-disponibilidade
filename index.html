@@ -11,6 +11,11 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
         .zoom-container {
             width: 100vw;
@@ -20,22 +25,29 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            touch-action: auto;
+            touch-action: manipulation; /* Permite zoom e rolagem */
         }
         .map-container {
             position: relative;
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px; /* Permite mapa maior */
             height: auto;
             border: 2px solid #ddd;
             border-radius: 8px;
-            touch-action: auto;
+            touch-action: manipulation; /* Permite gestos no celular */
         }
         #map {
             width: 100%;
             height: auto;
             display: block;
-            touch-action: auto;
+            touch-action: manipulation;
+        }
+        #lotes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
         .lote {
             position: absolute;
@@ -68,10 +80,10 @@
 
         async function carregarDados() {
             try {
-                const response = await fetch(url, { cache: "no-cache" }); // Evita carregar dados antigos
+                const response = await fetch(url, { cache: "no-cache" });
                 const dados = await response.json();
                 const container = document.getElementById("lotes");
-                container.innerHTML = ""; // Evita sobreposição
+                container.innerHTML = "";
 
                 dados.forEach(lote => {
                     const bolinha = document.createElement("div");
@@ -88,8 +100,8 @@
                     bolinha.style.backgroundColor = cores[lote.status.toLowerCase()] || "black";
 
                     // Ajuste fino das coordenadas
-                    const ajusteX = -3; 
-                    const ajusteY = -3; 
+                    const ajusteX = -6; 
+                    const ajusteY = -6; 
                     
                     bolinha.style.left = `${lote.x + ajusteX}px`;
                     bolinha.style.top = `${lote.y + ajusteY}px`;
@@ -109,3 +121,4 @@
 
 </body>
 </html>
+
