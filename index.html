@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Disponibilidade</title>
+    <style>
+        body {
+            text-align: center;
+        }
+        .map-container {
+            position: relative;
+            display: inline-block;
+        }
+        .map-container img {
+            width: 100%;
+            max-width: 800px;
+        }
+        .lote {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mapa de Disponibilidade</h1>
+    <div class="map-container" id="map">
+        <img src="mapa.png" alt="Mapa do loteamento">
+    </div>
+
+    <script>
+        const sheetURL = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec"; // Cole o link do Apps Script aqui
+
+        async function carregarLotes() {
+            const response = await fetch(sheetURL);
+            const lotes = await response.json();
+            const map = document.getElementById("map");
+            
+            lotes.forEach(lote => {
+                const { quadra, lote: numero, status, x, y } = lote;
+                const color = {
+                    "disponivel": "green",
+                    "reservado": "orange",
+                    "vendido": "red",
+                    "fora de venda": "gray"
+                }[status.toLowerCase()] || "black";
+
+                const div = document.createElement("div");
+                div.className = "lote";
+                div.style.backgroundColor = color;
+                div.style.left = `${x}px`;
+                div.style.top = `${y}px`;
+                div.style.position = "absolute";
+                div.textContent = numero;
+                map.appendChild(div);
+            });
+        }
+
+        carregarLotes();
+    </script>
+</body>
+</html>
