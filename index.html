@@ -7,64 +7,79 @@
     <style>
         body {
             text-align: center;
+            font-family: Arial, sans-serif;
         }
         .map-container {
             position: relative;
             display: inline-block;
         }
-        .map-container img {
+        #map {
             width: 100%;
             max-width: 800px;
         }
         .lote {
             position: absolute;
-            width: 5px;
-            height: 5px;
+            width: 4px;  /* Reduzi mais o tamanho da bolinha */
+            height: 4px;
             border-radius: 50%;
-            color: white;
             text-align: center;
-            line-height: 5px;
-            font-size: 5px;
+            font-size: 2px;  /* Ajustei o tamanho do número */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Mapa de Disponibilidade</h1>
-    <div class="map-container" id="map">
-        <img src="mapa.png" alt="Mapa do loteamento">
+
+    <h2>Mapa de Disponibilidade</h2>
+    <div class="map-container">
+        <img id="map" src="mapa.png" alt="Mapa do Loteamento">
+        <div id="lotes"></div>
     </div>
 
     <script>
-        const sheetURL = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec"; // Cole o link do Apps Script aqui
-
-        async function carregarLotes() {
-            const response = await fetch(sheetURL);
-            const lotes = await response.json();
-            const map = document.getElementById("map");
+        const url = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec";
+        
+        async function carregarDados() {
+            const response = await fetch(url);
+            const dados = await response.json();
+            const container = document.getElementById("lotes");
             
-            lotes.forEach(lote => {
-                const { quadra, lote: numero, status, x, y } = lote;
-                const color = {
-                    "disponivel": "green",
-                    "reservado": "orange",
-                    "vendido": "red",
-                    "fora de venda": "gray"
-                }[status.toLowerCase()] || "black";
+            dados.forEach(lote => {
+                const bolinha = document.createElement("div");
+                bolinha.classList.add("lote");
+                bolinha.textContent = lote.lote;
 
-                const div = document.createElement("div");
-                div.className = "lote";
-                div.style.backgroundColor = color;
-                div.style.left = `${x}px`;
-                div.style.top = `${y}px`;
-                div.style.position = "absolute";
-                div.textContent = numero;
-                map.appendChild(div);
+                // Define a cor com base no status
+                switch (lote.status.toLowerCase()) {
+                    case "disponivel":
+                        bolinha.style.backgroundColor = "green";
+                        break;
+                    case "reservado":
+                        bolinha.style.backgroundColor = "orange";
+                        break;
+                    case "vendido":
+                        bolinha.style.backgroundColor = "red";
+                        break;
+                    case "fora de venda":
+                        bolinha.style.backgroundColor = "gray";
+                        break;
+                }
+
+                // Posicionamento com base nas coordenadas
+                bolinha.style.left = `${lote.x}px`;
+                bolinha.style.top = `${lote.y}px`;
+                bolinha.style.position = "absolute";
+
+                container.appendChild(bolinha);
             });
         }
 
-        carregarLotes();
+        carregarDados();
     </script>
+
 </body>
 </html>
