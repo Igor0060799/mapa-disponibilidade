@@ -10,11 +10,15 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
         }
         .zoom-container {
+            flex-grow: 1;
             width: 100vw;
-            height: 100vh;
             overflow: auto;
             display: flex;
             flex-direction: column;
@@ -37,17 +41,24 @@
             touch-action: auto;
         }
         #coordenadas {
-            margin-top: 10px;
             font-size: 18px;
             font-weight: bold;
             color: blue;
+            padding: 10px;
+        }
+        footer {
+            width: 100%;
+            padding: 10px;
+            background: #f1f1f1;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
     <h2>Capturar Coordenadas</h2>
-    <div id="coordenadas">Clique no mapa para ver as coordenadas</div>
     
     <div class="zoom-container">
         <div class="map-container" id="mapContainer">
@@ -55,9 +66,14 @@
         </div>
     </div>
 
+    <div id="coordenadas">Clique no mapa para ver as coordenadas</div>
+
+    <footer>
+        &copy; 2025 - Sistema de Disponibilidade
+    </footer>
+
     <script>
         document.getElementById("map").addEventListener("click", function(event) {
-            const mapContainer = document.getElementById("mapContainer");
             const rect = event.target.getBoundingClientRect();
 
             // Captura a posição correta em relação ao mapa
@@ -71,3 +87,4 @@
 
 </body>
 </html>
+
