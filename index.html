@@ -11,15 +11,22 @@
             margin: 0;
             padding: 0;
         }
+        .zoom-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: auto; /* Permite rolagem */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .map-container {
             position: relative;
-            width: 800px; /* Tamanho fixo para evitar deslocamento */
+            width: 800px; /* Tamanho fixo */
             height: 600px; /* Ajuste conforme necessário */
-            margin: 20px auto;
             border: 2px solid #ddd;
             border-radius: 8px;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
+            touch-action: none; /* Permite zoom no celular */
+            transform-origin: top left;
         }
         #map {
             width: 100%;
@@ -44,9 +51,11 @@
 <body>
 
     <h2>Mapa de Disponibilidade</h2>
-    <div class="map-container">
-        <img id="map" src="mapa.png" alt="Mapa do Loteamento">
-        <div id="lotes"></div>
+    <div class="zoom-container">
+        <div class="map-container">
+            <img id="map" src="mapa.png" alt="Mapa do Loteamento">
+            <div id="lotes"></div>
+        </div>
     </div>
 
     <script>
@@ -57,7 +66,7 @@
             const dados = await response.json();
             const container = document.getElementById("lotes");
 
-            // Adiciona as bolinhas fixas na posição correta
+            // Adiciona as bolinhas na posição correta
             dados.forEach(lote => {
                 const bolinha = document.createElement("div");
                 bolinha.classList.add("lote");
@@ -93,3 +102,4 @@
 
 </body>
 </html>
+
