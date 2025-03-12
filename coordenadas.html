@@ -56,11 +56,15 @@
     </div>
 
     <script>
-        // Função para capturar clique no mapa e mostrar coordenadas
-        document.getElementById("mapContainer").addEventListener("click", function(event) {
+        document.getElementById("map").addEventListener("click", function(event) {
+            const mapContainer = document.getElementById("mapContainer");
             const rect = event.target.getBoundingClientRect();
+
+            // Captura a posição correta em relação ao mapa
             const x = Math.round(event.clientX - rect.left);
             const y = Math.round(event.clientY - rect.top);
+
+            // Exibe as coordenadas na tela
             document.getElementById("coordenadas").innerText = `Coordenadas: X=${x}, Y=${y}`;
         });
     </script>
