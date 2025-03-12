@@ -36,19 +36,28 @@
 
     <script>
         document.getElementById("map").addEventListener("click", function(event) {
-            const rect = event.target.getBoundingClientRect();
-            
-            // Ajuste fino nas coordenadas
-            const ajusteX = 3; // Corrigindo deslocamento para a esquerda
-            const ajusteY = 3; // Corrigindo deslocamento para cima
+            const img = event.target;
+            const rect = img.getBoundingClientRect();
 
-            const x = Math.round(event.clientX - rect.left - ajusteX);
-            const y = Math.round(event.clientY - rect.top - ajusteY);
+            // Tamanho real da imagem
+            const imgWidth = img.naturalWidth;
+            const imgHeight = img.naturalHeight;
 
-            document.getElementById("coordenadas").textContent = `Coordenadas: X=${x}, Y=${y}`;
+            // Tamanho da imagem na tela
+            const displayedWidth = rect.width;
+            const displayedHeight = rect.height;
+
+            // Coordenadas do clique relativas à imagem na tela
+            const xClick = event.clientX - rect.left;
+            const yClick = event.clientY - rect.top;
+
+            // Ajustando para a escala real da imagem
+            const xReal = Math.round((xClick / displayedWidth) * imgWidth);
+            const yReal = Math.round((yClick / displayedHeight) * imgHeight);
+
+            document.getElementById("coordenadas").textContent = `Coordenadas: X=${xReal}, Y=${yReal}`;
         });
     </script>
 
 </body>
 </html>
-
