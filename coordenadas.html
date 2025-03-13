@@ -129,7 +129,7 @@
         document.getElementById("mapa-container").addEventListener("click", function(e) {
             let rect = document.getElementById("mapa").getBoundingClientRect();
             
-            // Corrige as coordenadas levando em conta o zoom e o deslocamento
+            // **Correção final do cálculo**
             let x = (e.clientX - rect.left - mapX) / zoomLevel;
             let y = (e.clientY - rect.top - mapY) / zoomLevel;
 
@@ -137,6 +137,7 @@
             x = Math.round(x);
             y = Math.round(y);
 
+            // **Mostra coordenadas corrigidas**
             document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
         });
 
