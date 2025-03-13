@@ -25,6 +25,7 @@
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
+            transform: scale(1) translate(0, 0);
             transform-origin: top left;
         }
         .bolinha {
@@ -73,12 +74,12 @@
 
         function zoomIn() {
             zoomLevel += 0.1;
-            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
         function zoomOut() {
             zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
         // Movimento do mapa
