@@ -12,8 +12,9 @@
         }
         #mapa-container {
             position: relative;
-            width: 800px;
-            height: 600px;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
             overflow: hidden;
             border: 2px solid black;
             margin: auto;
@@ -21,8 +22,8 @@
             touch-action: none;
         }
         #mapa {
-            width: 800px;
-            height: 600px;
+            width: 100%;
+            height: 100%;
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
@@ -33,11 +34,11 @@
         }
         .bolinha {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             text-align: center;
-            font-size: 5px;
+            font-size: 6px;
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -153,42 +154,53 @@
             }
         }
 
-        function carregarLotes() {
-            $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
-                const container = $("#mapa");
-                container.empty();
+        async function carregarLotes() {
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec");
+                const data = await response.json();
+                const container = document.getElementById("mapa");
+                container.innerHTML = "";
+
+                let fragment = document.createDocumentFragment();
 
                 data.forEach(lote => {
                     let status = lote.status ? lote.status.trim().toLowerCase() : "";
                     let cor = getCorPorStatus(status);
-
                     let xAjustado = lote.x - 4;
                     let yAjustado = lote.y - 5;
 
-                    const bolinha = $(`<div class='bolinha' style='left:${xAjustado}px; top:${yAjustado}px; background:${cor};'>${lote.lote}</div>`);
-                    const infoBalao = $(`
-                        <div class='info-balao' style='left:${xAjustado + 15}px; top:${yAjustado}px;'>
-                            <strong>Quadra:</strong> ${lote.quadra}<br>
-                            <strong>Lote:</strong> ${lote.lote}<br>
-                            <strong>Metragem:</strong> ${lote.metragem} m²<br>
-                            <strong>Status:</strong> ${lote.status}
-                        </div>
-                    `);
+                    const bolinha = document.createElement("div");
+                    bolinha.className = "bolinha";
+                    bolinha.style.left = `${xAjustado}px`;
+                    bolinha.style.top = `${yAjustado}px`;
+                    bolinha.style.background = cor;
+                    bolinha.innerText = lote.lote;
 
-                    bolinha.hover(
-                        function() { infoBalao.show(); },
-                        function() { infoBalao.hide(); }
-                    );
+                    const infoBalao = document.createElement("div");
+                    infoBalao.className = "info-balao";
+                    infoBalao.style.left = `${xAjustado + 15}px`;
+                    infoBalao.style.top = `${yAjustado}px`;
+                    infoBalao.innerHTML = `
+                        <strong>Quadra:</strong> ${lote.quadra}<br>
+                        <strong>Lote:</strong> ${lote.lote}<br>
+                        <strong>Metragem:</strong> ${lote.metragem} m²<br>
+                        <strong>Status:</strong> ${lote.status}
+                    `;
 
-                    container.append(bolinha);
-                    container.append(infoBalao);
+                    bolinha.addEventListener("mouseenter", () => infoBalao.style.display = "block");
+                    bolinha.addEventListener("mouseleave", () => infoBalao.style.display = "none");
+
+                    fragment.appendChild(bolinha);
+                    fragment.appendChild(infoBalao);
                 });
-            }).fail(function(jqxhr, textStatus, error) {
-                console.error("Erro ao carregar os lotes:", textStatus, error);
-            });
+
+                container.appendChild(fragment);
+            } catch (error) {
+                console.error("Erro ao carregar os lotes:", error);
+            }
         }
 
-        carregarLotes();
+        document.addEventListener("DOMContentLoaded", carregarLotes);
     </script>
 
 </body>
