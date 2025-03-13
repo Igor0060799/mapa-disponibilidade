@@ -31,6 +31,10 @@
             transform: translate(0px, 0px) scale(1);
             transform-origin: top left;
         }
+        #coordenadas {
+            margin-top: 20px;
+            font-size: 16px;
+        }
         #zoom-controls {
             position: fixed;
             bottom: 20px;
@@ -44,59 +48,22 @@
             font-size: 16px;
             cursor: pointer;
         }
-        table {
-            width: 50%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f0f0f0;
-        }
-        #copiar {
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            background: blue;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
 
-    <h2>Coordenadas do Mapa</h2>
+    <h2>Obter Coordenadas do Mapa</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
     </div>
 
+    <div id="coordenadas">Clique no mapa para capturar as coordenadas.</div>
+
     <div id="zoom-controls">
         <button onclick="zoomIn()">+ Zoom</button>
         <button onclick="zoomOut()">- Zoom</button>
     </div>
-
-    <h3>Coordenadas Registradas:</h3>
-    <table id="coordenadas-tabela">
-        <thead>
-            <tr>
-                <th>Quadra</th>
-                <th>Lote</th>
-                <th>Coordenada X</th>
-                <th>Coordenada Y</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <button id="copiar">Copiar Tudo</button>
 
     <script>
         let zoomLevel = 1.0;
@@ -136,43 +103,21 @@
             isDragging = false;
         });
 
-        $(document).ready(function() {
-            $("#mapa-container").click(function(event) {
-                let rect = this.getBoundingClientRect();
-                
-                // Ajustando o cálculo correto da posição X e Y
-                let x = (event.clientX - rect.left - mapX) / zoomLevel;
-                let y = (event.clientY - rect.top - mapY) / zoomLevel;
+        document.getElementById("mapa-container").addEventListener("click", function(e) {
+            let rect = this.getBoundingClientRect();
+            let x = Math.round((e.clientX - rect.left) / zoomLevel);
+            let y = Math.round((e.clientY - rect.top) / zoomLevel);
 
-                let quadra = prompt("Digite a Quadra:");
-                let lote = prompt("Digite o Lote:");
+            // Ajuste das coordenadas para precisão
+            let xCorrigido = x + 3;
+            let yCorrigido = y + 4;
 
-                if (quadra && lote) {
-                    let novaLinha = `<tr><td>${quadra}</td><td>${lote}</td><td>${Math.round(x)}</td><td>${Math.round(y)}</td></tr>`;
-                    $("#coordenadas-tabela tbody").append(novaLinha);
-                }
-            });
-
-            $("#copiar").click(function() {
-                let texto = "";
-                $("#coordenadas-tabela tbody tr").each(function() {
-                    let linha = $(this).find("td").map(function() {
-                        return $(this).text();
-                    }).get().join("\t");
-                    texto += linha + "\n";
-                });
-
-                navigator.clipboard.writeText(texto).then(() => {
-                    alert("Coordenadas copiadas para a área de transferência!");
-                }).catch(err => {
-                    alert("Erro ao copiar coordenadas.");
-                });
-            });
+            document.getElementById("coordenadas").innerText = `Coordenadas: X = ${xCorrigido}, Y = ${yCorrigido}`;
         });
+
     </script>
 
 </body>
-
 <footer style="margin-top: 20px; text-align: center; font-size: 14px;">
     &copy; 2025. Todos os direitos reservados.<br>
     Produzido por <a href="https://wa.me/5562999337289" target="_blank" style="text-decoration: none; color: blue; font-weight: bold;">
