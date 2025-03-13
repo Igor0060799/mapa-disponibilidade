@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordenadas do Mapa</title>
+    <title>Captura de Coordenadas</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -34,6 +34,7 @@
         #coordenadas {
             margin-top: 20px;
             font-size: 16px;
+            font-weight: bold;
         }
         #zoom-controls {
             position: fixed;
@@ -52,7 +53,7 @@
 </head>
 <body>
 
-    <h2>Obter Coordenadas do Mapa</h2>
+    <h2>Captura de Coordenadas</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
@@ -103,6 +104,27 @@
             isDragging = false;
         });
 
+        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - mapX;
+                startY = e.touches[0].clientY - mapY;
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                mapX = e.touches[0].clientX - startX;
+                mapY = e.touches[0].clientY - startY;
+                atualizarTransformacao();
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchend", function() {
+            isDragging = false;
+        });
+
         document.getElementById("mapa-container").addEventListener("click", function(e) {
             let rect = document.getElementById("mapa").getBoundingClientRect();
             
@@ -110,11 +132,7 @@
             let x = Math.round((e.clientX - rect.left - mapX) / zoomLevel);
             let y = Math.round((e.clientY - rect.top - mapY) / zoomLevel);
 
-            // Ajuste fino para precisão
-            let xCorrigido = x + 3;
-            let yCorrigido = y + 4;
-
-            document.getElementById("coordenadas").innerText = `Coordenadas: X = ${xCorrigido}, Y = ${yCorrigido}`;
+            document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
         });
 
     </script>
