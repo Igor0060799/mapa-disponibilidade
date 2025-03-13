@@ -25,8 +25,9 @@
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
-            transform: scale(1) translate(0, 0);
-            transform-origin: top left;
+            left: 0;
+            top: 0;
+            transform-origin: center center;
         }
         #coordenadas {
             margin-top: 15px;
@@ -58,60 +59,14 @@
         let isDragging = false;
         let startX, startY, mapX = 0, mapY = 0;
 
-        function zoomIn() {
-            zoomLevel += 0.1;
-            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-        }
+        function zoomIn() { zoomLevel += 0.1; }
+        function zoomOut() { zoomLevel = Math.max(0.5, zoomLevel - 0.1); }
 
-        function zoomOut() {
-            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-        }
-
-        // Movimento do mapa
-        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
-            isDragging = true;
-            startX = e.clientX - mapX;
-            startY = e.clientY - mapY;
-        });
-
-        document.addEventListener("mousemove", function(e) {
-            if (isDragging) {
-                mapX = e.clientX - startX;
-                mapY = e.clientY - startY;
-                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-            }
-        });
-
-        document.addEventListener("mouseup", function() {
-            isDragging = false;
-        });
-
-        // Para touch no celular
-        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
-            isDragging = true;
-            startX = e.touches[0].clientX - mapX;
-            startY = e.touches[0].clientY - mapY;
-        });
-
-        document.addEventListener("touchmove", function(e) {
-            if (isDragging) {
-                mapX = e.touches[0].clientX - startX;
-                mapY = e.touches[0].clientY - startY;
-                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-            }
-        });
-
-        document.addEventListener("touchend", function() {
-            isDragging = false;
-        });
-
-        // Capturar coordenadas ao clicar no mapa
+        // Capturar coordenadas corrigidas
         document.getElementById("mapa").addEventListener("click", function(e) {
             let rect = this.getBoundingClientRect();
-            let x = Math.round((e.clientX - rect.left) / zoomLevel);
-            let y = Math.round((e.clientY - rect.top) / zoomLevel);
-
+            let x = Math.round((e.clientX - rect.left) / zoomLevel) - 4;
+            let y = Math.round((e.clientY - rect.top) / zoomLevel) - 5;
             document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
         });
 
@@ -119,4 +74,3 @@
 
 </body>
 </html>
-
