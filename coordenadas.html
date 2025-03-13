@@ -26,8 +26,6 @@
             background: url('mapa.png') no-repeat top left;
             background-size: contain;
             position: absolute;
-            left: 0;
-            top: 0;
             transform-origin: top left;
         }
         #coordenadas {
@@ -105,39 +103,16 @@
             document.getElementById("mapa-container").style.cursor = "grab";
         });
 
-        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - mapX;
-                startY = e.touches[0].clientY - mapY;
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
-            if (isDragging && e.touches.length === 1) {
-                e.preventDefault();
-                mapX = e.touches[0].clientX - startX;
-                mapY = e.touches[0].clientY - startY;
-                atualizarTransformacao();
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchend", function() {
-            isDragging = false;
-        });
-
         document.getElementById("mapa-container").addEventListener("click", function(e) {
-            let rect = document.getElementById("mapa").getBoundingClientRect();
+            let rect = document.getElementById("mapa-container").getBoundingClientRect();
             
-            // **Correção final do cálculo**
+            // 🔥 **Correção final** 🔥  
             let x = (e.clientX - rect.left - mapX) / zoomLevel;
             let y = (e.clientY - rect.top - mapY) / zoomLevel;
 
-            // Ajuste final para precisão
             x = Math.round(x);
             y = Math.round(y);
 
-            // **Mostra coordenadas corrigidas**
             document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
         });
 
@@ -152,3 +127,4 @@
 </footer>
 
 </html>
+
