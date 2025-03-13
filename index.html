@@ -25,8 +25,9 @@
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
-            transform: scale(1) translate(0, 0);
-            transform-origin: top left;
+            left: 0;
+            top: 0;
+            transform-origin: center center;
         }
         .bolinha {
             position: absolute;
@@ -101,25 +102,6 @@
             isDragging = false;
         });
 
-        // Para touch no celular
-        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
-            isDragging = true;
-            startX = e.touches[0].clientX - mapX;
-            startY = e.touches[0].clientY - mapY;
-        });
-
-        document.addEventListener("touchmove", function(e) {
-            if (isDragging) {
-                mapX = e.touches[0].clientX - startX;
-                mapY = e.touches[0].clientY - startY;
-                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-            }
-        });
-
-        document.addEventListener("touchend", function() {
-            isDragging = false;
-        });
-
         function carregarLotes() {
             $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
                 const container = $("#mapa");
@@ -133,23 +115,12 @@
                     else if (status === "reservado") cor = "orange";
                     else if (status === "vendido") cor = "red";
 
-                    const bolinha = $(`<div class='bolinha' style='left:${lote.x}px; top:${lote.y}px; background:${cor};'>${lote.lote}</div>`);
-                    const balao = $(`
-                        <div class='info-balao' style='left:${lote.x + 20}px; top:${lote.y}px;'>
-                            <strong>Quadra:</strong> ${lote.quadra}<br>
-                            <strong>Lote:</strong> ${lote.lote}<br>
-                            <strong>Metragem:</strong> ${lote.metragem} m²<br>
-                            <strong>Status:</strong> ${lote.status}
-                        </div>
-                    `);
+                    // Ajuste fino das coordenadas (-4 no X e -5 no Y)
+                    let xAjustado = lote.x - 4;
+                    let yAjustado = lote.y - 5;
 
-                    bolinha.on("click", function() {
-                        $(".info-balao").hide();
-                        balao.show();
-                    });
-
+                    const bolinha = $(`<div class='bolinha' style='left:${xAjustado}px; top:${yAjustado}px; background:${cor};'>${lote.lote}</div>`);
                     container.append(bolinha);
-                    container.append(balao);
                 });
             }).fail(function(jqxhr, textStatus, error) {
                 console.error("Erro ao carregar os lotes:", textStatus, error);
