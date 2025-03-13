@@ -104,11 +104,13 @@
         });
 
         document.getElementById("mapa-container").addEventListener("click", function(e) {
-            let rect = this.getBoundingClientRect();
-            let x = Math.round((e.clientX - rect.left) / zoomLevel);
-            let y = Math.round((e.clientY - rect.top) / zoomLevel);
+            let rect = document.getElementById("mapa").getBoundingClientRect();
+            
+            // Cálculo correto da posição com deslocamento e zoom aplicados
+            let x = Math.round((e.clientX - rect.left - mapX) / zoomLevel);
+            let y = Math.round((e.clientY - rect.top - mapY) / zoomLevel);
 
-            // Ajuste das coordenadas para precisão
+            // Ajuste fino para precisão
             let xCorrigido = x + 3;
             let yCorrigido = y + 4;
 
