@@ -149,9 +149,8 @@
 
         $(document).ready(function() {
             $("#mapa").click(function(event) {
-                let offset = $(this).offset();
-                let x = event.pageX - offset.left;
-                let y = event.pageY - offset.top;
+                let x = event.offsetX; // Captura X correto dentro do mapa
+                let y = event.offsetY; // Captura Y correto dentro do mapa
 
                 let coordenada = `X: ${x}, Y: ${y}`;
                 $("#coordenadas-lista").append(`<div class='coordenada-item'>${coordenada}</div>`);
