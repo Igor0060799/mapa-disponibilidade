@@ -13,22 +13,28 @@
         }
         .container {
             position: relative;
-            display: inline-block;
-        }
-        #map {
             width: 800px;
             height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            overflow: hidden;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
             display: block;
         }
         .bolinha {
             position: absolute;
-            width: 14px;
-            height: 14px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 5px;
             font-weight: bold;
             color: white;
             cursor: pointer;
@@ -54,21 +60,34 @@
             border-color: transparent white transparent transparent;
             transform: translateY(-50%);
         }
+        .zoom-buttons {
+            margin-top: 10px;
+        }
+        .zoom-buttons button {
+            font-size: 16px;
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <h2>Mapa de Disponibilidade</h2>
-    
+
     <div class="container">
         <img id="map" src="mapa.png" alt="Mapa do Loteamento">
         <div id="bolinhas-container"></div>
         <div id="balao" class="balao"></div>
     </div>
 
+    <div class="zoom-buttons">
+        <button onclick="zoomIn()">➕ Zoom In</button>
+        <button onclick="zoomOut()">➖ Zoom Out</button>
+    </div>
+
     <script>
         const urlPlanilha = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec";
-
         const statusCores = {
             "Disponível": "green",
             "Reservado": "orange",
@@ -76,30 +95,33 @@
             "Fora de venda": "gray"
         };
 
-        const container = document.getElementById("bolinhas-container");
+        const container = document.querySelector(".container");
+        const mapa = document.getElementById("map");
         const balao = document.getElementById("balao");
+        let zoomLevel = 1;
 
         function carregarDados() {
             fetch(urlPlanilha)
                 .then(response => response.json())
                 .then(dados => {
-                    console.log("Dados carregados:", dados);
                     criarBolinhas(dados);
                 })
                 .catch(error => console.error("Erro ao carregar dados:", error));
         }
 
         function criarBolinhas(dadosLotes) {
-            container.innerHTML = "";
+            const bolinhasContainer = document.getElementById("bolinhas-container");
+            bolinhasContainer.innerHTML = "";
+
             dadosLotes.forEach(lote => {
                 const bolinha = document.createElement("div");
                 bolinha.className = "bolinha";
                 bolinha.style.backgroundColor = statusCores[lote.status] || "black";
-                bolinha.style.left = lote.x + "px";
-                bolinha.style.top = lote.y + "px";
+                bolinha.style.left = lote.x * zoomLevel + "px";
+                bolinha.style.top = lote.y * zoomLevel + "px";
                 bolinha.innerText = lote.lote;
                 bolinha.onclick = (e) => mostrarBalao(e, lote);
-                container.appendChild(bolinha);
+                bolinhasContainer.appendChild(bolinha);
             });
         }
 
@@ -114,16 +136,31 @@
             balao.style.display = "block";
         }
 
+        function zoomIn() {
+            zoomLevel *= 1.2;
+            atualizarZoom();
+        }
+
+        function zoomOut() {
+            zoomLevel *= 0.8;
+            atualizarZoom();
+        }
+
+        function atualizarZoom() {
+            mapa.style.transform = `scale(${zoomLevel})`;
+            mapa.style.transformOrigin = "center";
+            criarBolinhas(dadosLotes);
+        }
+
         document.addEventListener("click", (event) => {
             if (!event.target.classList.contains("bolinha")) {
                 balao.style.display = "none";
             }
         });
 
-        // Carregar os dados da planilha ao carregar a página
+        // Iniciar carregamento dos dados da planilha
         carregarDados();
     </script>
 
 </body>
 </html>
-
