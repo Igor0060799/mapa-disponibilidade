@@ -139,11 +139,10 @@
         $(document).ready(function() {
             $("#mapa-container").click(function(event) {
                 let rect = this.getBoundingClientRect();
-                let scaleX = this.offsetWidth / rect.width;
-                let scaleY = this.offsetHeight / rect.height;
-
-                let x = (event.clientX - rect.left) * scaleX - 2;
-                let y = (event.clientY - rect.top) * scaleY - 2;
+                
+                // Ajustando o cálculo correto da posição X e Y
+                let x = (event.clientX - rect.left - mapX) / zoomLevel;
+                let y = (event.clientY - rect.top - mapY) / zoomLevel;
 
                 let quadra = prompt("Digite a Quadra:");
                 let lote = prompt("Digite o Lote:");
