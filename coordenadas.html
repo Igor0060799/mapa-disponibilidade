@@ -25,10 +25,11 @@
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
+            transform: scale(1) translate(0, 0);
             transform-origin: top left;
         }
         #coordenadas {
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 16px;
             font-weight: bold;
         }
@@ -39,7 +40,7 @@
 </head>
 <body>
 
-    <h2>Coordenadas do Mapa</h2>
+    <h2>Obter Coordenadas</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
@@ -50,7 +51,7 @@
         <button onclick="zoomOut()">- Zoom</button>
     </div>
 
-    <p id="coordenadas">Clique no mapa para ver as coordenadas</p>
+    <p id="coordenadas">Clique no mapa para obter as coordenadas.</p>
 
     <script>
         let zoomLevel = 1.0;
@@ -59,12 +60,12 @@
 
         function zoomIn() {
             zoomLevel += 0.1;
-            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
         function zoomOut() {
             zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
         // Movimento do mapa
@@ -105,15 +106,17 @@
             isDragging = false;
         });
 
-        // Mostrar coordenadas ao clicar no mapa
+        // Capturar coordenadas ao clicar no mapa
         document.getElementById("mapa").addEventListener("click", function(e) {
-            let rect = e.target.getBoundingClientRect();
+            let rect = this.getBoundingClientRect();
             let x = Math.round((e.clientX - rect.left) / zoomLevel);
             let y = Math.round((e.clientY - rect.top) / zoomLevel);
-            document.getElementById("coordenadas").textContent = `Coordenadas: X ${x}, Y ${y}`;
+
+            document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
         });
 
     </script>
 
 </body>
 </html>
+
