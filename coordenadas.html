@@ -28,22 +28,34 @@
             position: absolute;
             left: 0;
             top: 0;
+            transform: translate(0px, 0px) scale(1);
+            transform-origin: top left;
         }
-        #coordenadas-lista {
-            margin-top: 20px;
-            text-align: left;
-            display: inline-block;
+        #zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
         }
-        .coordenada-item {
-            font-size: 14px;
-            padding: 5px;
-            background: #f0f0f0;
-            margin: 3px 0;
-            border-radius: 5px;
+        #zoom-controls button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
             cursor: pointer;
         }
-        .coordenada-item:hover {
-            background: #d0d0d0;
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
         }
         #copiar {
             margin-top: 10px;
@@ -65,30 +77,90 @@
         <div id="mapa"></div>
     </div>
 
-    <div>
-        <h3>Coordenadas Clicadas:</h3>
-        <div id="coordenadas-lista"></div>
-        <button id="copiar">Copiar Tudo</button>
+    <div id="zoom-controls">
+        <button onclick="zoomIn()">+ Zoom</button>
+        <button onclick="zoomOut()">- Zoom</button>
     </div>
 
+    <h3>Coordenadas Registradas:</h3>
+    <table id="coordenadas-tabela">
+        <thead>
+            <tr>
+                <th>Quadra</th>
+                <th>Lote</th>
+                <th>Coordenada X</th>
+                <th>Coordenada Y</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <button id="copiar">Copiar Tudo</button>
+
     <script>
+        let zoomLevel = 1.0;
+        let mapX = 0, mapY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        function zoomIn() {
+            zoomLevel += 0.1;
+            atualizarTransformacao();
+        }
+
+        function zoomOut() {
+            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+            atualizarTransformacao();
+        }
+
+        function atualizarTransformacao() {
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+        }
+
+        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
+            isDragging = true;
+            startX = e.clientX - mapX;
+            startY = e.clientY - mapY;
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            if (isDragging) {
+                mapX = e.clientX - startX;
+                mapY = e.clientY - startY;
+                atualizarTransformacao();
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            isDragging = false;
+        });
+
         $(document).ready(function() {
             $("#mapa-container").click(function(event) {
-                let rect = this.getBoundingClientRect(); // Pega as dimensões do container
-                let scaleX = this.offsetWidth / rect.width; // Ajuste para escala X
-                let scaleY = this.offsetHeight / rect.height; // Ajuste para escala Y
+                let rect = this.getBoundingClientRect();
+                let scaleX = this.offsetWidth / rect.width;
+                let scaleY = this.offsetHeight / rect.height;
 
-                let x = (event.clientX - rect.left) * scaleX - 2; // Ajuste para borda
-                let y = (event.clientY - rect.top) * scaleY - 2; // Ajuste para borda
+                let x = (event.clientX - rect.left) * scaleX - 2;
+                let y = (event.clientY - rect.top) * scaleY - 2;
 
-                let coordenada = `X: ${Math.round(x)}, Y: ${Math.round(y)}`;
-                $("#coordenadas-lista").append(`<div class='coordenada-item'>${coordenada}</div>`);
+                let quadra = prompt("Digite a Quadra:");
+                let lote = prompt("Digite o Lote:");
+
+                if (quadra && lote) {
+                    let novaLinha = `<tr><td>${quadra}</td><td>${lote}</td><td>${Math.round(x)}</td><td>${Math.round(y)}</td></tr>`;
+                    $("#coordenadas-tabela tbody").append(novaLinha);
+                }
             });
 
             $("#copiar").click(function() {
                 let texto = "";
-                $(".coordenada-item").each(function() {
-                    texto += $(this).text() + "\n";
+                $("#coordenadas-tabela tbody tr").each(function() {
+                    let linha = $(this).find("td").map(function() {
+                        return $(this).text();
+                    }).get().join("\t");
+                    texto += linha + "\n";
                 });
 
                 navigator.clipboard.writeText(texto).then(() => {
