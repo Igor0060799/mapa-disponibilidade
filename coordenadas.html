@@ -128,13 +128,13 @@
         });
 
         document.getElementById("mapa-container").addEventListener("click", function(e) {
-            let rect = document.getElementById("mapa-container").getBoundingClientRect();
+            let rect = document.getElementById("mapa").getBoundingClientRect();
             
-            // Ajuste correto levando em conta o deslocamento (mapX e mapY)
+            // Corrigindo o deslocamento X e Y considerando zoom e arrasto corretamente
             let x = (e.clientX - rect.left - mapX) / zoomLevel;
             let y = (e.clientY - rect.top - mapY) / zoomLevel;
 
-            // Ajustando para arredondar corretamente
+            // Ajuste final para precisão
             x = Math.round(x);
             y = Math.round(y);
 
