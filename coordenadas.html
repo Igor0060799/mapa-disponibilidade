@@ -23,7 +23,7 @@
         #mapa {
             width: 800px;
             height: 600px;
-            background: url('mapa.png') no-repeat center;
+            background: url('mapa.png') no-repeat top left;
             background-size: contain;
             position: absolute;
             left: 0;
@@ -128,7 +128,7 @@
         document.getElementById("mapa-container").addEventListener("click", function(e) {
             let rect = document.getElementById("mapa").getBoundingClientRect();
             
-            // Cálculo correto da posição com deslocamento e zoom aplicados
+            // Ajustando para zoom e deslocamento correto
             let x = Math.round((e.clientX - rect.left - mapX) / zoomLevel);
             let y = Math.round((e.clientY - rect.top - mapY) / zoomLevel);
 
