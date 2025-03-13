@@ -17,21 +17,23 @@
             overflow: hidden;
             border: 2px solid black;
             margin: auto;
+            cursor: grab;
         }
         #mapa {
-            width: 100%;
-            height: 100%;
+            width: 1600px;
+            height: 1200px;
             background: url('mapa.png') no-repeat center;
             background-size: cover;
-            position: relative;
+            position: absolute;
+            transform-origin: top left;
         }
         .bolinha {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             text-align: center;
-            font-size: 10px;
+            font-size: 5px;
             color: white;
             line-height: 12px;
             font-weight: bold;
@@ -66,7 +68,9 @@
 
     <script>
         let zoomLevel = 1.0;
-        
+        let isDragging = false;
+        let startX, startY, mapX = 0, mapY = 0;
+
         function zoomIn() {
             zoomLevel += 0.1;
             document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
@@ -76,6 +80,44 @@
             zoomLevel = Math.max(0.5, zoomLevel - 0.1);
             document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
         }
+
+        // Movimento do mapa
+        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
+            isDragging = true;
+            startX = e.clientX - mapX;
+            startY = e.clientY - mapY;
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            if (isDragging) {
+                mapX = e.clientX - startX;
+                mapY = e.clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            isDragging = false;
+        });
+
+        // Para touch no celular
+        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX - mapX;
+            startY = e.touches[0].clientY - mapY;
+        });
+
+        document.addEventListener("touchmove", function(e) {
+            if (isDragging) {
+                mapX = e.touches[0].clientX - startX;
+                mapY = e.touches[0].clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.addEventListener("touchend", function() {
+            isDragging = false;
+        });
 
         function carregarLotes() {
             $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
