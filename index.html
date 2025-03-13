@@ -55,11 +55,11 @@
         }
         .lote {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             text-align: center;
-            font-size: 5px;
+            font-size: 9px;
             color: white;
             display: flex;
             align-items: center;
@@ -89,6 +89,24 @@
         .zoom-buttons button:hover {
             background-color: #0056b3;
         }
+        .legenda {
+            margin-top: 10px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .legenda div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .bolinha-legenda {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
@@ -104,6 +122,14 @@
             <button onclick="zoomIn()">+</button>
             <button onclick="zoomOut()">−</button>
         </div>
+    </div>
+
+    <!-- LEGENDA -->
+    <div class="legenda">
+        <div><span class="bolinha-legenda" style="background-color: green;"></span> Disponível</div>
+        <div><span class="bolinha-legenda" style="background-color: orange;"></span> Reservado</div>
+        <div><span class="bolinha-legenda" style="background-color: red;"></span> Vendido</div>
+        <div><span class="bolinha-legenda" style="background-color: gray;"></span> Fora de venda</div>
     </div>
 
     <script>
