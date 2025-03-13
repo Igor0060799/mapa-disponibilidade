@@ -52,7 +52,7 @@
             border: 1px solid black;
             padding: 5px;
             font-size: 12px;
-            width: 140px;
+            width: 160px;
             text-align: left;
             z-index: 100;
         }
@@ -69,6 +69,19 @@
             font-size: 16px;
             cursor: pointer;
         }
+        #coordenadas-table {
+            width: 60%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        #coordenadas-table th, #coordenadas-table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        #coordenadas-table th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +96,20 @@
         <button onclick="zoomIn()">+ Zoom</button>
         <button onclick="zoomOut()">- Zoom</button>
     </div>
+
+    <h3>Coordenadas Cadastradas</h3>
+    <table id="coordenadas-table">
+        <thead>
+            <tr>
+                <th>Quadra</th>
+                <th>Lote</th>
+                <th>Coordenada X</th>
+                <th>Coordenada Y</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <script>
         let zoomLevel = 1.0;
@@ -121,27 +148,6 @@
             isDragging = false;
         });
 
-        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - mapX;
-                startY = e.touches[0].clientY - mapY;
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
-            if (isDragging && e.touches.length === 1) {
-                e.preventDefault();
-                mapX = e.touches[0].clientX - startX;
-                mapY = e.touches[0].clientY - startY;
-                atualizarTransformacao();
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchend", function() {
-            isDragging = false;
-        });
-
         function getCorPorStatus(status) {
             switch (status.toLowerCase().trim()) {
                 case "disponivel":
@@ -163,11 +169,10 @@
                 container.empty();
 
                 data.forEach(lote => {
-                    let status = lote.status ? lote.status.trim().toLowerCase() : "";
-                    let cor = getCorPorStatus(status);
+                    let cor = getCorPorStatus(lote.status);
 
-                    let xAjustado = lote.x;
-                    let yAjustado = lote.y;
+                    let xAjustado = parseInt(lote.x) + 3;
+                    let yAjustado = parseInt(lote.y) + 4;
 
                     const bolinha = $(`<div class='bolinha' style='left:${xAjustado}px; top:${yAjustado}px; background:${cor};'>${lote.lote}</div>`);
                     const infoBalao = $(`
@@ -175,7 +180,8 @@
                             <strong>Quadra:</strong> ${lote.quadra}<br>
                             <strong>Lote:</strong> ${lote.lote}<br>
                             <strong>Metragem:</strong> ${lote.metragem} m²<br>
-                            <strong>Status:</strong> ${lote.status}
+                            <strong>Status:</strong> ${lote.status}<br>
+                            <strong>Rua:</strong> ${lote.rua}
                         </div>
                     `);
 
@@ -192,6 +198,25 @@
             });
         }
 
+        $("#mapa-container").click(function(e) {
+            let x = e.offsetX - 3;
+            let y = e.offsetY - 4;
+
+            let quadra = prompt("Digite a Quadra:");
+            let lote = prompt("Digite o Lote:");
+
+            if (quadra && lote) {
+                $("#coordenadas-table tbody").append(`
+                    <tr>
+                        <td>${quadra}</td>
+                        <td>${lote}</td>
+                        <td>${x}</td>
+                        <td>${y}</td>
+                    </tr>
+                `);
+            }
+        });
+
         carregarLotes();
     </script>
 
@@ -202,6 +227,4 @@
         Metro Comunicação
     </a>
 </footer>
-
 </html>
-
