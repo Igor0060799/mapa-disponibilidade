@@ -149,9 +149,10 @@
                     let status = lote.status ? lote.status.trim().toLowerCase() : "";
                     let cor = "#808080"; // Cinza padrão
 
-                    if (status === "disponivel") cor = "green";
-                    else if (status === "reservado") cor = "orange";
-                    else if (status === "vendido") cor = "red";
+                    if (status === "Disponivel") cor = "green";
+                    else if (status === "Reservado") cor = "orange";
+                    else if (status === "Vendido") cor = "red";
+                    else if (status === "Fora de Venda") cor = "gray";
 
                     let xAjustado = lote.x - 4;
                     let yAjustado = lote.y - 5;
