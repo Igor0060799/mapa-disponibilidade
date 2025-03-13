@@ -1,109 +1,118 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capturar Coordenadas</title>
+    <title>Coordenadas do Mapa</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             text-align: center;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
         }
-        .mapa-container {
+        #mapa-container {
             position: relative;
             width: 800px;
             height: 600px;
-            margin: auto;
             overflow: hidden;
-            border: 2px solid #ddd;
-            background: #f8f8f8;
+            border: 2px solid black;
+            margin: auto;
+            cursor: grab;
         }
-        .mapa-wrapper {
+        #mapa {
+            width: 1600px;
+            height: 1200px;
+            background: url('mapa.png') no-repeat center;
+            background-size: contain;
             position: absolute;
-            width: 100%;
-            height: 100%;
-            transform-origin: center;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .zoom-buttons {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 5px;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .zoom-buttons button {
-            font-size: 16px;
-            padding: 5px;
-            cursor: pointer;
-            border: none;
-            background: #007bff;
-            color: white;
-            border-radius: 3px;
-        }
-        .zoom-buttons button:hover {
-            background: #0056b3;
+            transform-origin: top left;
         }
         #coordenadas {
-            margin-top: 20px;
-            font-size: 18px;
+            margin-top: 10px;
+            font-size: 16px;
             font-weight: bold;
+        }
+        #zoom-controls {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <h2>Capturar Coordenadas do Mapa</h2>
-
-    <div class="mapa-container">
-        <div class="mapa-wrapper" id="mapa-wrapper">
-            <img id="map" src="mapa.png" alt="Mapa do Loteamento">
-        </div>
-        <div class="zoom-buttons">
-            <button onclick="zoomIn()">➕</button>
-            <button onclick="zoomOut()">➖</button>
-        </div>
+    <h2>Coordenadas do Mapa</h2>
+    
+    <div id="mapa-container">
+        <div id="mapa"></div>
     </div>
 
-    <p id="coordenadas">Clique no mapa para ver as coordenadas.</p>
+    <div id="zoom-controls">
+        <button onclick="zoomIn()">+ Zoom</button>
+        <button onclick="zoomOut()">- Zoom</button>
+    </div>
+
+    <p id="coordenadas">Clique no mapa para ver as coordenadas</p>
 
     <script>
-        const mapaWrapper = document.getElementById("mapa-wrapper");
-        const mapa = document.getElementById("map");
-        const coordenadasDisplay = document.getElementById("coordenadas");
-
-        let zoomLevel = 1;
-
-        mapa.addEventListener("click", function(event) {
-            const rect = mapa.getBoundingClientRect();
-            const x = Math.round((event.clientX - rect.left) / zoomLevel);
-            const y = Math.round((event.clientY - rect.top) / zoomLevel);
-            coordenadasDisplay.innerHTML = `Coordenadas: X = ${x}, Y = ${y}`;
-        });
+        let zoomLevel = 1.0;
+        let isDragging = false;
+        let startX, startY, mapX = 0, mapY = 0;
 
         function zoomIn() {
-            zoomLevel *= 1.2;
-            atualizarZoom();
+            zoomLevel += 0.1;
+            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
         }
 
         function zoomOut() {
-            zoomLevel *= 0.8;
-            atualizarZoom();
+            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+            document.getElementById("mapa").style.transform = `scale(${zoomLevel})`;
         }
 
-        function atualizarZoom() {
-            mapaWrapper.style.transform = `scale(${zoomLevel})`;
-        }
+        // Movimento do mapa
+        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
+            isDragging = true;
+            startX = e.clientX - mapX;
+            startY = e.clientY - mapY;
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            if (isDragging) {
+                mapX = e.clientX - startX;
+                mapY = e.clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            isDragging = false;
+        });
+
+        // Para touch no celular
+        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
+            isDragging = true;
+            startX = e.touches[0].clientX - mapX;
+            startY = e.touches[0].clientY - mapY;
+        });
+
+        document.addEventListener("touchmove", function(e) {
+            if (isDragging) {
+                mapX = e.touches[0].clientX - startX;
+                mapY = e.touches[0].clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.addEventListener("touchend", function() {
+            isDragging = false;
+        });
+
+        // Mostrar coordenadas ao clicar no mapa
+        document.getElementById("mapa").addEventListener("click", function(e) {
+            let rect = e.target.getBoundingClientRect();
+            let x = Math.round((e.clientX - rect.left) / zoomLevel);
+            let y = Math.round((e.clientY - rect.top) / zoomLevel);
+            document.getElementById("coordenadas").textContent = `Coordenadas: X ${x}, Y ${y}`;
+        });
+
     </script>
 
 </body>
