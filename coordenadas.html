@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obter Coordenadas</title>
+    <title>Mapa de Disponibilidade</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             text-align: center;
@@ -20,14 +21,39 @@
             touch-action: none;
         }
         #mapa {
-            width: 800px;
-            height: 600px;
+            width: 100%;
+            height: 100%;
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
             left: 0;
             top: 0;
-            transform-origin: center center;
+            transform-origin: top left;
+        }
+        .bolinha {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .info-balao {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid black;
+            padding: 5px;
+            font-size: 12px;
+            width: 140px;
+            text-align: left;
+            z-index: 100;
         }
         #zoom-controls {
             position: fixed;
@@ -42,16 +68,11 @@
             font-size: 16px;
             cursor: pointer;
         }
-        #coordenadas {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
 
-    <h2>Obter Coordenadas do Mapa</h2>
+    <h2>Mapa de Disponibilidade</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
@@ -62,8 +83,6 @@
         <button onclick="zoomOut()">- Zoom</button>
     </div>
 
-    <div id="coordenadas">Clique no mapa para obter as coordenadas</div>
-
     <script>
         let zoomLevel = 1.0;
         let isDragging = false;
@@ -71,15 +90,23 @@
 
         function zoomIn() {
             zoomLevel += 0.1;
-            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            atualizarTransformacao();
         }
 
         function zoomOut() {
             zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            atualizarTransformacao();
         }
 
-        // Movimento do mapa com mouse
+        function atualizarTransformacao() {
+            const mapa = document.getElementById("mapa");
+            mapa.style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+
+            document.querySelectorAll(".bolinha").forEach(bolinha => {
+                bolinha.style.transform = `scale(${1 / zoomLevel})`;
+            });
+        }
+
         document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
             isDragging = true;
             startX = e.clientX - mapX;
@@ -90,7 +117,7 @@
             if (isDragging) {
                 mapX = e.clientX - startX;
                 mapY = e.clientY - startY;
-                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+                atualizarTransformacao();
             }
         });
 
@@ -98,7 +125,6 @@
             isDragging = false;
         });
 
-        // Movimento do mapa com touch no celular
         document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
             if (e.touches.length === 1) {
                 isDragging = true;
@@ -112,7 +138,7 @@
                 e.preventDefault();
                 mapX = e.touches[0].clientX - startX;
                 mapY = e.touches[0].clientY - startY;
-                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+                atualizarTransformacao();
             }
         });
 
@@ -120,15 +146,63 @@
             isDragging = false;
         });
 
-        // Capturar coordenadas do clique no mapa
-        document.getElementById("mapa").addEventListener("click", function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = Math.round((e.clientX - rect.left) / zoomLevel);
-            const y = Math.round((e.clientY - rect.top) / zoomLevel);
+        function getCorPorStatus(status) {
+            switch (status.toLowerCase().trim()) {
+                case "disponivel":
+                    return "green";
+                case "reservado":
+                    return "orange";
+                case "vendido":
+                    return "red";
+                case "fora de venda":
+                    return "gray";
+                default:
+                    return "gray";
+            }
+        }
 
-            document.getElementById("coordenadas").innerText = `Coordenadas: X=${x}, Y=${y}`;
-        });
+        function carregarLotes() {
+            $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
+                const container = $("#mapa");
+                container.empty();
 
+                data.forEach(lote => {
+                    let status = lote.status ? lote.status.trim().toLowerCase() : "";
+                    let cor = getCorPorStatus(status);
+
+                    let xAjustado = lote.x;
+                    let yAjustado = lote.y;
+
+                    const bolinha = $(`
+                        <div class='bolinha' style='left:${xAjustado}px; top:${yAjustado}px; background:${cor}; transform: scale(${1 / zoomLevel});'>
+                            ${lote.lote}
+                        </div>
+                    `);
+                    const infoBalao = $(`
+                        <div class='info-balao' style='left:${xAjustado + 15}px; top:${yAjustado}px;'>
+                            <strong>Quadra:</strong> ${lote.quadra}<br>
+                            <strong>Lote:</strong> ${lote.lote}<br>
+                            <strong>Metragem:</strong> ${lote.metragem} m²<br>
+                            <strong>Status:</strong> ${lote.status}
+                        </div>
+                    `);
+
+                    bolinha.hover(
+                        function() { infoBalao.show(); },
+                        function() { infoBalao.hide(); }
+                    );
+
+                    container.append(bolinha);
+                    container.append(infoBalao);
+                });
+
+                atualizarTransformacao();
+            }).fail(function(jqxhr, textStatus, error) {
+                console.error("Erro ao carregar os lotes:", textStatus, error);
+            });
+        }
+
+        carregarLotes();
     </script>
 
 </body>
