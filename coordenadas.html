@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coordenadas do Mapa</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Obter Coordenadas</title>
     <style>
         body {
             text-align: center;
@@ -18,10 +17,11 @@
             border: 2px solid black;
             margin: auto;
             cursor: grab;
+            touch-action: none;
         }
         #mapa {
-            width: 800px;
-            height: 600px;
+            width: 1600px;
+            height: 1200px;
             background: url('mapa.png') no-repeat center;
             background-size: contain;
             position: absolute;
@@ -29,19 +29,29 @@
             top: 0;
             transform-origin: center center;
         }
-        #coordenadas {
-            margin-top: 15px;
-            font-size: 16px;
-            font-weight: bold;
-        }
         #zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        #zoom-controls button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #coordenadas {
             margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h2>Obter Coordenadas</h2>
+    <h2>Obter Coordenadas do Mapa</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
@@ -52,22 +62,71 @@
         <button onclick="zoomOut()">- Zoom</button>
     </div>
 
-    <p id="coordenadas">Clique no mapa para obter as coordenadas.</p>
+    <div id="coordenadas">Clique no mapa para obter as coordenadas</div>
 
     <script>
         let zoomLevel = 1.0;
         let isDragging = false;
         let startX, startY, mapX = 0, mapY = 0;
 
-        function zoomIn() { zoomLevel += 0.1; }
-        function zoomOut() { zoomLevel = Math.max(0.5, zoomLevel - 0.1); }
+        function zoomIn() {
+            zoomLevel += 0.1;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+        }
 
-        // Capturar coordenadas corrigidas
+        function zoomOut() {
+            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+        }
+
+        // Movimento do mapa com mouse
+        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
+            isDragging = true;
+            startX = e.clientX - mapX;
+            startY = e.clientY - mapY;
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            if (isDragging) {
+                mapX = e.clientX - startX;
+                mapY = e.clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            isDragging = false;
+        });
+
+        // Movimento do mapa com touch no celular
+        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - mapX;
+                startY = e.touches[0].clientY - mapY;
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                mapX = e.touches[0].clientX - startX;
+                mapY = e.touches[0].clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchend", function() {
+            isDragging = false;
+        });
+
+        // Capturar coordenadas do clique no mapa
         document.getElementById("mapa").addEventListener("click", function(e) {
-            let rect = this.getBoundingClientRect();
-            let x = Math.round((e.clientX - rect.left) / zoomLevel) - 4;
-            let y = Math.round((e.clientY - rect.top) / zoomLevel) - 5;
-            document.getElementById("coordenadas").innerText = `Coordenadas: X = ${x}, Y = ${y}`;
+            const rect = this.getBoundingClientRect();
+            const x = Math.round((e.clientX - rect.left) / zoomLevel);
+            const y = Math.round((e.clientY - rect.top) / zoomLevel);
+
+            document.getElementById("coordenadas").innerText = `Coordenadas: X=${x}, Y=${y}`;
         });
 
     </script>
