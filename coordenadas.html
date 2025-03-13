@@ -17,7 +17,7 @@
             overflow: hidden;
             border: 2px solid black;
             margin: auto;
-            cursor: crosshair;
+            cursor: grab;
             touch-action: none;
         }
         #mapa {
@@ -83,14 +83,14 @@
         }
 
         function atualizarTransformacao() {
-            const mapa = document.getElementById("mapa");
-            mapa.style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
         document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
             isDragging = true;
             startX = e.clientX - mapX;
             startY = e.clientY - mapY;
+            document.getElementById("mapa-container").style.cursor = "grabbing";
         });
 
         document.addEventListener("mousemove", function(e) {
@@ -103,6 +103,7 @@
 
         document.addEventListener("mouseup", function() {
             isDragging = false;
+            document.getElementById("mapa-container").style.cursor = "grab";
         });
 
         document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
@@ -127,9 +128,9 @@
         });
 
         document.getElementById("mapa-container").addEventListener("click", function(e) {
-            let rect = document.getElementById("mapa").getBoundingClientRect();
+            let rect = document.getElementById("mapa-container").getBoundingClientRect();
             
-            // Pegando a posição relativa ao mapa
+            // Ajuste correto levando em conta o deslocamento (mapX e mapY)
             let x = (e.clientX - rect.left - mapX) / zoomLevel;
             let y = (e.clientY - rect.top - mapY) / zoomLevel;
 
@@ -151,4 +152,3 @@
 </footer>
 
 </html>
-
