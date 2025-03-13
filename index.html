@@ -13,32 +13,24 @@
         #mapa-container {
             position: relative;
             width: 800px;
-            max-width: 100%;
             height: 600px;
+            margin: auto;
             overflow: hidden;
             border: 2px solid black;
-            margin: auto;
             cursor: grab;
             touch-action: none;
         }
         #mapa {
-            width: 100%;
-            height: 100%;
-            background: url('mapa.png') no-repeat center;
-            background-size: contain;
-            position: absolute;
-            left: 0;
-            top: 0;
-            transform: translate(0, 0) scale(1);
-            transform-origin: top left;
+            width: 800px;
+            height: 600px;
+            display: block;
         }
         .bolinha {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            text-align: center;
-            font-size: 6px;
+            font-size: 7px;
             color: white;
             font-weight: bold;
             cursor: pointer;
@@ -57,19 +49,6 @@
             text-align: left;
             z-index: 100;
         }
-        #zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        #zoom-controls button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -77,72 +56,10 @@
     <h2>Mapa de Disponibilidade</h2>
     
     <div id="mapa-container">
-        <div id="mapa"></div>
-    </div>
-
-    <div id="zoom-controls">
-        <button onclick="zoomIn()">+ Zoom</button>
-        <button onclick="zoomOut()">- Zoom</button>
+        <img id="mapa" src="mapa.png" alt="Mapa de Disponibilidade">
     </div>
 
     <script>
-        let zoomLevel = 1.0;
-        let isDragging = false;
-        let startX, startY, mapX = 0, mapY = 0;
-
-        function zoomIn() {
-            zoomLevel += 0.1;
-            updateTransform();
-        }
-
-        function zoomOut() {
-            zoomLevel = Math.max(0.5, zoomLevel - 0.1);
-            updateTransform();
-        }
-
-        function updateTransform() {
-            document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
-        }
-
-        document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
-            isDragging = true;
-            startX = e.clientX - mapX;
-            startY = e.clientY - mapY;
-        });
-
-        document.addEventListener("mousemove", function(e) {
-            if (isDragging) {
-                mapX = e.clientX - startX;
-                mapY = e.clientY - startY;
-                updateTransform();
-            }
-        });
-
-        document.addEventListener("mouseup", function() {
-            isDragging = false;
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - mapX;
-                startY = e.touches[0].clientY - mapY;
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
-            if (isDragging && e.touches.length === 1) {
-                e.preventDefault();
-                mapX = e.touches[0].clientX - startX;
-                mapY = e.touches[0].clientY - startY;
-                updateTransform();
-            }
-        });
-
-        document.getElementById("mapa-container").addEventListener("touchend", function() {
-            isDragging = false;
-        });
-
         function getCorPorStatus(status) {
             switch (status.toLowerCase().trim()) {
                 case "disponivel":
@@ -162,17 +79,14 @@
             try {
                 const response = await fetch("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec");
                 const data = await response.json();
-                const container = document.getElementById("mapa");
-                container.innerHTML = "";
-
-                let fragment = document.createDocumentFragment();
+                const container = document.getElementById("mapa-container");
 
                 data.forEach(lote => {
                     let cor = getCorPorStatus(lote.status);
-                    let escala = container.clientWidth / 800; // Ajuste proporcional
 
-                    let xAjustado = lote.x * escala;
-                    let yAjustado = lote.y * escala;
+                    // Posições exatas SEM escala para manter a precisão
+                    let xAjustado = lote.x;
+                    let yAjustado = lote.y;
 
                     const bolinha = document.createElement("div");
                     bolinha.className = "bolinha";
@@ -195,11 +109,9 @@
                     bolinha.addEventListener("mouseenter", () => infoBalao.style.display = "block");
                     bolinha.addEventListener("mouseleave", () => infoBalao.style.display = "none");
 
-                    fragment.appendChild(bolinha);
-                    fragment.appendChild(infoBalao);
+                    container.appendChild(bolinha);
+                    container.appendChild(infoBalao);
                 });
-
-                container.appendChild(fragment);
             } catch (error) {
                 console.error("Erro ao carregar os lotes:", error);
             }
