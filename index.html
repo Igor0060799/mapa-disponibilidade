@@ -67,11 +67,7 @@
     </div>
 
     <script>
-        const dadosLotes = [
-            { quadra: 1, lote: 12, metragem: 250, x: 474, y: 443, status: "Disponível" },
-            { quadra: 1, lote: 15, metragem: 300, x: 500, y: 450, status: "Vendido" },
-            { quadra: 2, lote: 8, metragem: 275, x: 550, y: 420, status: "Reservado" }
-        ];
+        const urlPlanilha = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec";
 
         const statusCores = {
             "Disponível": "green",
@@ -83,7 +79,18 @@
         const container = document.getElementById("bolinhas-container");
         const balao = document.getElementById("balao");
 
-        function criarBolinhas() {
+        function carregarDados() {
+            fetch(urlPlanilha)
+                .then(response => response.json())
+                .then(dados => {
+                    console.log("Dados carregados:", dados);
+                    criarBolinhas(dados);
+                })
+                .catch(error => console.error("Erro ao carregar dados:", error));
+        }
+
+        function criarBolinhas(dadosLotes) {
+            container.innerHTML = "";
             dadosLotes.forEach(lote => {
                 const bolinha = document.createElement("div");
                 bolinha.className = "bolinha";
@@ -113,8 +120,10 @@
             }
         });
 
-        criarBolinhas();
+        // Carregar os dados da planilha ao carregar a página
+        carregarDados();
     </script>
 
 </body>
 </html>
+
