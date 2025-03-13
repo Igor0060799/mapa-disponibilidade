@@ -23,17 +23,17 @@
             width: 1600px;
             height: 1200px;
             background: url('mapa.png') no-repeat center;
-            background-size: cover;
+            background-size: contain;
             position: absolute;
             transform-origin: top left;
         }
         .bolinha {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             text-align: center;
-            font-size: 5px;
+            font-size: 10px;
             color: white;
             line-height: 12px;
             font-weight: bold;
@@ -150,6 +150,8 @@
                     container.append(bolinha);
                     container.append(balao);
                 });
+            }).fail(function(jqxhr, textStatus, error) {
+                console.error("Erro ao carregar os lotes:", textStatus, error);
             });
         }
 
