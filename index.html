@@ -31,11 +31,11 @@
         }
         .bolinha {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             text-align: center;
-            font-size: 5px;
+            font-size: 10px;
             color: white;
             line-height: 12px;
             font-weight: bold;
@@ -48,7 +48,9 @@
             border: 1px solid black;
             padding: 5px;
             font-size: 12px;
-            width: 120px;
+            width: 140px;
+            text-align: left;
+            z-index: 100;
         }
         #zoom-controls {
             margin-top: 10px;
@@ -120,7 +122,22 @@
                     let yAjustado = lote.y - 5;
 
                     const bolinha = $(`<div class='bolinha' style='left:${xAjustado}px; top:${yAjustado}px; background:${cor};'>${lote.lote}</div>`);
+                    const infoBalao = $(`
+                        <div class='info-balao' style='left:${xAjustado + 15}px; top:${yAjustado}px;'>
+                            <strong>Quadra:</strong> ${lote.quadra}<br>
+                            <strong>Lote:</strong> ${lote.lote}<br>
+                            <strong>Metragem:</strong> ${lote.metragem} m²<br>
+                            <strong>Status:</strong> ${lote.status}
+                        </div>
+                    `);
+
+                    bolinha.hover(
+                        function() { infoBalao.show(); },
+                        function() { infoBalao.hide(); }
+                    );
+
                     container.append(bolinha);
+                    container.append(infoBalao);
                 });
             }).fail(function(jqxhr, textStatus, error) {
                 console.error("Erro ao carregar os lotes:", textStatus, error);
