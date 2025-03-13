@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa de Disponibilidade</title>
     <style>
         body {
@@ -19,11 +19,13 @@
         }
         .map-container {
             position: relative;
-            width: 800px; /* Tamanho fixo do mapa */
+            width: 800px;
             height: 600px;
             border: 2px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
+            transform-origin: center;
+            transition: transform 0.2s ease-in-out;
         }
         #map {
             width: 100%;
@@ -39,16 +41,39 @@
         }
         .lote {
             position: absolute;
-            width: 7px;
-            height: 7px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             text-align: center;
-            font-size: 6px;
+            font-size: 9px;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+        }
+        .zoom-buttons {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .zoom-buttons button {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .zoom-buttons button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -56,12 +81,29 @@
 
     <h2>Mapa de Disponibilidade</h2>
     
-    <div class="map-container">
-        <img id="map" src="mapa.png" alt="Mapa do Loteamento" loading="lazy">
+    <div class="map-container" id="mapContainer">
+        <img id="map" src="mapa.png" alt="Mapa do Loteamento">
         <div id="lotes"></div>
+        <div class="zoom-buttons">
+            <button onclick="zoomIn()">+</button>
+            <button onclick="zoomOut()">−</button>
+        </div>
     </div>
 
     <script>
+        let scale = 1;
+        const mapContainer = document.getElementById("mapContainer");
+
+        function zoomIn() {
+            scale = Math.min(scale + 0.2, 2); // Máximo zoom: 2x
+            mapContainer.style.transform = `scale(${scale})`;
+        }
+
+        function zoomOut() {
+            scale = Math.max(scale - 0.2, 1); // Mínimo zoom: 1x (normal)
+            mapContainer.style.transform = `scale(${scale})`;
+        }
+
         const url = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec";
 
         async function carregarDados() {
@@ -106,4 +148,3 @@
 
 </body>
 </html>
-
