@@ -28,23 +28,23 @@
             position: absolute;
             left: 0;
             top: 0;
+            transform: translate(0, 0) scale(1);
             transform-origin: center center;
         }
         .bolinha {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    text-align: center;
-    font-size: 5px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 6px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .info-balao {
             display: none;
             position: absolute;
@@ -99,7 +99,6 @@
             document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
-        // Movimento do mapa com mouse
         document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
             isDragging = true;
             startX = e.clientX - mapX;
@@ -118,7 +117,6 @@
             isDragging = false;
         });
 
-        // Movimento do mapa com touch no celular
         document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
             if (e.touches.length === 1) {
                 isDragging = true;
@@ -140,6 +138,21 @@
             isDragging = false;
         });
 
+        function getCorPorStatus(status) {
+            switch (status.toLowerCase().trim()) {
+                case "disponivel":
+                    return "green";
+                case "reservado":
+                    return "orange";
+                case "vendido":
+                    return "red";
+                case "fora de venda":
+                    return "gray";
+                default:
+                    return "gray";
+            }
+        }
+
         function carregarLotes() {
             $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
                 const container = $("#mapa");
@@ -147,12 +160,7 @@
 
                 data.forEach(lote => {
                     let status = lote.status ? lote.status.trim().toLowerCase() : "";
-                    let cor = "#808080"; // Cinza padrão
-
-                    if (status === "Disponivel") cor = "green";
-                    else if (status === "Reservado") cor = "orange";
-                    else if (status === "Vendido") cor = "red";
-                    else if (status === "Fora de Venda") cor = "gray";
+                    let cor = getCorPorStatus(status);
 
                     let xAjustado = lote.x - 4;
                     let yAjustado = lote.y - 5;
