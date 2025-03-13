@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa de Disponibilidade - Flora Parque</title>
+    <title>Mapa de Disponibilidade</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -18,6 +18,7 @@
             border: 2px solid black;
             margin: auto;
             cursor: grab;
+            touch-action: none;
         }
         #mapa {
             width: 800px;
@@ -31,11 +32,11 @@
         }
         .bolinha {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             text-align: center;
-            font-size: 10px;
+            font-size: 5px;
             color: white;
             line-height: 12px;
             font-weight: bold;
@@ -53,13 +54,23 @@
             z-index: 100;
         }
         #zoom-controls {
-            margin-top: 10px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        #zoom-controls button {
+            margin: 5px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h2>Mapa de Disponibilidade - Flora Parque</h2>
+    <h2>Mapa de Disponibilidade</h2>
     
     <div id="mapa-container">
         <div id="mapa"></div>
@@ -85,7 +96,7 @@
             document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
         }
 
-        // Movimento do mapa
+        // Movimento do mapa com mouse
         document.getElementById("mapa-container").addEventListener("mousedown", function(e) {
             isDragging = true;
             startX = e.clientX - mapX;
@@ -104,6 +115,28 @@
             isDragging = false;
         });
 
+        // Movimento do mapa com touch no celular
+        document.getElementById("mapa-container").addEventListener("touchstart", function(e) {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - mapX;
+                startY = e.touches[0].clientY - mapY;
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchmove", function(e) {
+            if (isDragging && e.touches.length === 1) {
+                e.preventDefault();
+                mapX = e.touches[0].clientX - startX;
+                mapY = e.touches[0].clientY - startY;
+                document.getElementById("mapa").style.transform = `translate(${mapX}px, ${mapY}px) scale(${zoomLevel})`;
+            }
+        });
+
+        document.getElementById("mapa-container").addEventListener("touchend", function() {
+            isDragging = false;
+        });
+
         function carregarLotes() {
             $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
                 const container = $("#mapa");
@@ -117,7 +150,6 @@
                     else if (status === "reservado") cor = "orange";
                     else if (status === "vendido") cor = "red";
 
-                    // Ajuste fino das coordenadas (-4 no X e -5 no Y)
                     let xAjustado = lote.x - 4;
                     let yAjustado = lote.y - 5;
 
