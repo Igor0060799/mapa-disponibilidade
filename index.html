@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa de Disponibilidade</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             text-align: center;
@@ -25,35 +26,12 @@
             width: 100%;
             height: 100%;
             transform-origin: center;
+            cursor: grab;
         }
         #map {
             width: 100%;
             height: 100%;
             display: block;
-        }
-        .bolinha {
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 5px;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transform: translate(-50%, -50%);
-        }
-        .balao {
-            position: absolute;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 6px;
-            font-size: 12px;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            display: none;
         }
         .zoom-buttons {
             position: absolute;
@@ -78,6 +56,28 @@
         .zoom-buttons button:hover {
             background: #0056b3;
         }
+        .bolinha {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 5px;
+            font-weight: bold;
+            line-height: 15px;
+            color: white;
+            cursor: pointer;
+        }
+        .info-balao {
+            position: absolute;
+            background: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -88,7 +88,6 @@
         <div class="mapa-wrapper" id="mapa-wrapper">
             <img id="map" src="mapa.png" alt="Mapa do Loteamento">
             <div id="bolinhas-container"></div>
-            <div id="balao" class="balao"></div>
         </div>
         <div class="zoom-buttons">
             <button onclick="zoomIn()">➕</button>
@@ -97,80 +96,100 @@
     </div>
 
     <script>
-        const urlPlanilha = "https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec";
-        const statusCores = {
-            "Disponível": "green",
-            "Reservado": "orange",
-            "Vendido": "red",
-            "Fora de venda": "gray"
-        };
-
         const mapaWrapper = document.getElementById("mapa-wrapper");
-        const bolinhasContainer = document.getElementById("bolinhas-container");
-        const balao = document.getElementById("balao");
-
         let zoomLevel = 1;
-
-        function carregarDados() {
-            fetch(urlPlanilha)
-                .then(response => response.json())
-                .then(dados => {
-                    criarBolinhas(dados);
-                })
-                .catch(error => console.error("Erro ao carregar dados:", error));
-        }
-
-        function criarBolinhas(dadosLotes) {
-            bolinhasContainer.innerHTML = "";
-
-            dadosLotes.forEach(lote => {
-                const bolinha = document.createElement("div");
-                bolinha.className = "bolinha";
-                bolinha.style.backgroundColor = statusCores[lote.status] || "black";
-                bolinha.style.left = (lote.x * zoomLevel) + "px";
-                bolinha.style.top = (lote.y * zoomLevel) + "px";
-                bolinha.innerText = lote.lote;
-                bolinha.onclick = (e) => mostrarBalao(e, lote);
-                bolinhasContainer.appendChild(bolinha);
-            });
-        }
-
-        function mostrarBalao(event, lote) {
-            balao.style.left = (event.target.offsetLeft + 20) + "px";
-            balao.style.top = event.target.offsetTop + "px";
-            balao.innerHTML = `
-                <strong>Quadra ${lote.quadra} - Lote ${lote.lote}</strong><br>
-                Metragem: ${lote.metragem} m²<br>
-                Status: ${lote.status}
-            `;
-            balao.style.display = "block";
-        }
+        let isDragging = false;
+        let startX, startY, translateX = 0, translateY = 0;
 
         function zoomIn() {
             zoomLevel *= 1.2;
-            atualizarZoom();
+            atualizarTransform();
         }
 
         function zoomOut() {
             zoomLevel *= 0.8;
-            atualizarZoom();
+            atualizarTransform();
         }
 
-        function atualizarZoom() {
-            mapaWrapper.style.transform = `scale(${zoomLevel})`;
-            criarBolinhas(dadosLotes);
+        function atualizarTransform() {
+            mapaWrapper.style.transform = `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`;
         }
 
-        document.addEventListener("click", (event) => {
-            if (!event.target.classList.contains("bolinha")) {
-                balao.style.display = "none";
+        mapaWrapper.addEventListener("mousedown", (event) => {
+            isDragging = true;
+            startX = event.clientX - translateX;
+            startY = event.clientY - translateY;
+            mapaWrapper.style.cursor = "grabbing";
+        });
+
+        document.addEventListener("mouseup", () => {
+            isDragging = false;
+            mapaWrapper.style.cursor = "grab";
+        });
+
+        document.addEventListener("mousemove", (event) => {
+            if (!isDragging) return;
+            translateX = event.clientX - startX;
+            translateY = event.clientY - startY;
+            atualizarTransform();
+        });
+
+        mapaWrapper.addEventListener("touchstart", (event) => {
+            if (event.touches.length === 1) {
+                isDragging = true;
+                startX = event.touches[0].clientX - translateX;
+                startY = event.touches[0].clientY - translateY;
             }
         });
 
-        // Carregar os dados da planilha ao carregar a página
-        carregarDados();
+        document.addEventListener("touchend", () => {
+            isDragging = false;
+        });
+
+        document.addEventListener("touchmove", (event) => {
+            if (!isDragging || event.touches.length !== 1) return;
+            translateX = event.touches[0].clientX - startX;
+            translateY = event.touches[0].clientY - startY;
+            atualizarTransform();
+        });
+
+        function carregarLotes() {
+            $.getJSON("https://script.google.com/macros/s/AKfycbziGg3Lhmo85CG0qtAu1ehAy2UERzG_zVRpjWeA9PGsao2cdslPRW3G6TuLYFNMrp3r/exec", function(data) {
+                const container = $("#bolinhas-container");
+                container.empty();
+
+                data.forEach(lote => {
+                    let cor = "#808080"; // Cinza por padrão
+                    if (lote.status === "disponivel") cor = "green";
+                    else if (lote.status === "reservado") cor = "orange";
+                    else if (lote.status === "vendido") cor = "red";
+
+                    const bolinha = $(`<div class='bolinha' style='left:${lote.x}px; top:${lote.y}px; background:${cor};'>${lote.lote}</div>`);
+                    const balao = $(`
+                        <div class='info-balao' style='left:${lote.x + 20}px; top:${lote.y}px;'>
+                            <strong>Quadra:</strong> ${lote.quadra}<br>
+                            <strong>Lote:</strong> ${lote.lote}<br>
+                            <strong>Metragem:</strong> ${lote.metragem} m²<br>
+                            <strong>Status:</strong> ${lote.status}
+                        </div>
+                    `);
+
+                    bolinha.on("click", function() {
+                        $(".info-balao").hide();
+                        balao.show();
+                    });
+
+                    container.append(bolinha);
+                    container.append(balao);
+                });
+            });
+        }
+
+        carregarLotes();
     </script>
 
 </body>
 </html>
 
+</body>
+</html>
