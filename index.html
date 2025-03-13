@@ -150,13 +150,13 @@
 
         function getCorPorStatus(status) {
             switch (status.toLowerCase().trim()) {
-                case "disponivel":
+                case "Disponivel":
                     return "green";
-                case "reservado":
+                case "Reservado":
                     return "orange";
-                case "vendido":
+                case "Vendido":
                     return "red";
-                case "fora de venda":
+                case "Fora de Venda":
                     return "gray";
                 default:
                     return "gray";
@@ -181,7 +181,7 @@
                             <strong>Lote:</strong> ${lote.lote}<br>
                             <strong>Metragem:</strong> ${lote.metragem} m²<br>
                             <strong>Status:</strong> ${lote.status}<br>
-                            <strong>Rua:</strong> ${lote.rua}
+                            <strong>Endereço:</strong> ${lote.rua}
                         </div>
                     `);
 
