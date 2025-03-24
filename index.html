@@ -6,29 +6,34 @@
     <title>Mapa de Disponibilidade</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-       html, body {
-    height: 100vh; /* Ocupa 100% da altura da tela */
-    width: 100vw; /* Ocupa 100% da largura da tela */
+       body {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Remove qualquer barra de rolagem */
+    height: 100vh; /* Faz o corpo da página ocupar exatamente a altura da tela */
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Centraliza verticalmente */
-    align-items: center; /* Centraliza horizontalmente */
+    justify-content: space-between; /* Distribui os elementos para evitar rolagem */
+    overflow: hidden; /* Impede que a página role para baixo */
 }
 
 
-        #mapa-container {
-            position: relative;
-            width: 800px;
-            height: 600px;
-            overflow: hidden;
-            border: 2px solid black;
-            margin: auto;
-            cursor: grab;
-            touch-action: none;
-        }
+       #mapa-container {
+    flex-grow: 1; /* Faz o mapa ocupar o espaço restante sem empurrar o rodapé para fora */
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h2 {
+    margin: 10px 0; /* Reduz espaço extra do título */
+}
+
+footer {
+    font-size: 14px;
+    padding: 5px;
+}
         #mapa {
             width: 800px;
             height: 600px;
