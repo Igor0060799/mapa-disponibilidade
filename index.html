@@ -57,18 +57,34 @@
             z-index: 100;
         }
         #zoom-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        #zoom-controls button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.8); /* Fundo levemente transparente */
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    z-index: 999; /* Mantém sempre visível */
+}
+
+#zoom-controls button {
+    margin: 5px;
+    padding: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    background: #007BFF;
+    color: white;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+#zoom-controls button:hover {
+    background: #0056b3;
+}
+
     </style>
 </head>
 <body>
