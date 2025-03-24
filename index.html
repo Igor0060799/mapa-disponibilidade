@@ -6,10 +6,17 @@
     <title>Mapa de Disponibilidade</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
+       ,body {
+    height: 100vh; /* Mantém a altura sempre igual à da tela */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Impede rolagem vertical */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza o conteúdo */
+    align-items: center; /* Alinha no centro */
+}
+
         #mapa-container {
             position: relative;
             width: 800px;
